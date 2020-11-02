@@ -102,7 +102,9 @@ def handle_socks5_negotiation(sock, negotiate, username=None, password=None):
     if negotiate:
         assert SOCKS_NEGOTIATION_PASSWORD in methods
         send_data = SOCKS_VERSION_SOCKS5 + SOCKS_NEGOTIATION_PASSWORD
+        print("send socks5 + pwd nego", send_data)
         sock.sendall(send_data)
+        print("sent!")
 
         # This is the password negotiation.
         negotiation_version = sock.recv(1)
@@ -122,7 +124,9 @@ def handle_socks5_negotiation(sock, negotiate, username=None, password=None):
     else:
         assert SOCKS_NEGOTIATION_NONE in methods
         send_data = SOCKS_VERSION_SOCKS5 + SOCKS_NEGOTIATION_NONE
+        print("send socks5 + no nego", send_data)
         sock.sendall(send_data)
+        print("sent!")
 
     # Client sends where they want to go.
     received_version = sock.recv(1)

@@ -55,6 +55,7 @@ def tests_impl(session, extras="socks,secure,brotli"):
         "pytest",
         "-r",
         "a",
+        "-k", "proxy_rejection", "-s",
         "--tb=native",
         "--no-success-flaky-report",
         *(session.posargs or ("test/",)),

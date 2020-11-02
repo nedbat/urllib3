@@ -33,43 +33,43 @@ jobs:
     - python: nightly
   include:
     # Unit tests
-    - python: 2.7
-      env: NOX_SESSION=test-2.7
-    - python: 3.5
-      env: NOX_SESSION=test-3.5
-    - python: 3.6
-      env: NOX_SESSION=test-3.6
-    - python: 3.7
-      env: NOX_SESSION=test-3.7
+    # - python: 2.7
+    #   env: NOX_SESSION=test-2.7
+    # - python: 3.5
+    #   env: NOX_SESSION=test-3.5
+    # - python: 3.6
+    #   env: NOX_SESSION=test-3.6
+    # - python: 3.7
+    #   env: NOX_SESSION=test-3.7
     - python: 3.8
       env: NOX_SESSION=test-3.8
     - python: 3.8
       env: NOX_SESSION=test-3.8
       dist: bionic
-    - python: 3.8
-      env: NOX_SESSION=test-3.8
-      dist: focal
-    - python: 3.9-dev
-      env: NOX_SESSION=test-3.9
-    - python: nightly
-      env: NOX_SESSION=test-3.10
-    - python: pypy2.7-7.3.1
-      env: NOX_SESSION=test-pypy
-    - python: pypy3.5-7.0
-      env: NOX_SESSION=test-pypy
-    - python: pypy3.6-7.3.1
-      env: NOX_SESSION=test-pypy
-    - python: pypy3.6-7.3.1
-      env: NOX_SESSION=test-pypy
-      dist: bionic
+    # - python: 3.8
+    #   env: NOX_SESSION=test-3.8
+    #   dist: focal
+    # - python: 3.9-dev
+    #   env: NOX_SESSION=test-3.9
+    # - python: nightly
+    #   env: NOX_SESSION=test-3.10
+    # - python: pypy2.7-7.3.1
+    #   env: NOX_SESSION=test-pypy
+    # - python: pypy3.5-7.0
+    #   env: NOX_SESSION=test-pypy
+    # - python: pypy3.6-7.3.1
+    #   env: NOX_SESSION=test-pypy
+    # - python: pypy3.6-7.3.1
+    #   env: NOX_SESSION=test-pypy
+    #   dist: bionic
 
-    # Extras
-    - python: 2.7
-      env: NOX_SESSION=app_engine GAE_SDK_PATH=${HOME}/.cache/google_appengine
-    - python: 2.7
-      env: NOX_SESSION=google_brotli-2
-    - python: 3.7
-      env: NOX_SESSION=google_brotli-3
+    # # Extras
+    # - python: 2.7
+    #   env: NOX_SESSION=app_engine GAE_SDK_PATH=${HOME}/.cache/google_appengine
+    # - python: 2.7
+    #   env: NOX_SESSION=google_brotli-2
+    # - python: 3.7
+    #   env: NOX_SESSION=google_brotli-3
 
     # Downstream integration tests.
     - python: 2.7
