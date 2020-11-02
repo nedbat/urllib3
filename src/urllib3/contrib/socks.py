@@ -105,7 +105,8 @@ class SOCKSConnection(HTTPConnection):
                 **extra_kw
             )
 
-        except SocketTimeout:
+        except SocketTimeout as e:
+            print("except SocketTimeout!", e)
             raise ConnectTimeoutError(
                 self,
                 "Connection to %s timed out. (connect timeout=%s)"
@@ -115,28 +116,38 @@ class SOCKSConnection(HTTPConnection):
         except socks.ProxyError as e:
             # This is fragile as hell, but it seems to be the only way to raise
             # useful errors here.
+            print(type(e), e, e.socket_err)
             if e.socket_err:
                 error = e.socket_err
                 if isinstance(error, SocketTimeout):
+                    print("raise ConnectTimeoutError")
                     raise ConnectTimeoutError(
                         self,
                         "Connection to %s timed out. (connect timeout=%s)"
                         % (self.host, self.timeout),
                     )
                 else:
+                    print("raise NewConnectionError")
                     raise NewConnectionError(
                         self, "Failed to establish a new connection: %s" % error
                     )
             else:
+                print("raise NewConnectionError #2")
                 raise NewConnectionError(
                     self, "Failed to establish a new connection: %s" % e
                 )
+            print("don't raise")
 
         except SocketError as e:  # Defensive: PySocks should catch all these.
+            print("except SocketError!", e)
             raise NewConnectionError(
                 self, "Failed to establish a new connection: %s" % e
             )
+        except Exception as e:
+            print("catchall", e)
+            raise
 
+        print("no raise!")
         return conn
 
 

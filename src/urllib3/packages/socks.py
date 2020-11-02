@@ -1,3 +1,4 @@
+import traceback
 from base64 import b64encode
 
 try:
@@ -198,8 +199,11 @@ def create_connection(
     err = None
 
     # Allow the SOCKS proxy to be on IPv4 or IPv6 addresses.
+    print(proxy_addr, proxy_port)
+    print(list(socket.getaddrinfo(proxy_addr, proxy_port, 0, socket.SOCK_STREAM)))
     for r in socket.getaddrinfo(proxy_addr, proxy_port, 0, socket.SOCK_STREAM):
         family, socket_type, proto, canonname, sa = r
+        print("ipv4 or ipv6?", family, socket_type, proto, canonname, sa)
         sock = None
         try:
             sock = socksocket(family, socket_type, proto)
@@ -227,12 +231,16 @@ def create_connection(
             return sock
 
         except (socket.error, ProxyError) as e:
+            print("create_connection", type(e), e)
+            print("create_connection, will try again")
             err = e
             if sock:
+                print("create_connection had sock, closing")
                 sock.close()
                 sock = None
 
     if err:
+        print("create_connection has err, raising")
         raise err
 
     raise socket.error("gai returned empty list.")
@@ -304,6 +312,7 @@ class socksocket(_BaseSocket):
         Blocks until the required number of bytes have been received."""
         data = b""
         while len(data) < count:
+            print("client read", count, len(data))
             d = file.read(count - len(data))
             if not d:
                 raise GeneralProxyError("Connection closed unexpectedly")
@@ -481,6 +490,7 @@ class socksocket(_BaseSocket):
     def _negotiate_SOCKS5(self, *dest_addr):
         """Negotiates a stream connection through a SOCKS5 server."""
         CONNECT = b"\x01"
+        print("_negotiate_SOCKS5!")
         self.proxy_peername, self.proxy_sockname = self._SOCKS5_request(
             self, CONNECT, dest_addr
         )
@@ -491,6 +501,8 @@ class socksocket(_BaseSocket):
         address (DST field). Returns resolved DST address that was used.
         """
         proxy_type, addr, port, rdns, username, password = self.proxy
+        print("client socks5 request", proxy_type, addr, port, rdns, username, password)
+        traceback.print_stack()
 
         writer = conn.makefile("wb")
         reader = conn.makefile("rb", 0)  # buffering=0 renamed in Python 3
@@ -500,8 +512,10 @@ class socksocket(_BaseSocket):
                 # The username/password details were supplied to the
                 # set_proxy method so we support the USERNAME/PASSWORD
                 # authentication (in addition to the standard none).
+                print("client send 05 02 00 02 pwd auth")
                 writer.write(b"\x05\x02\x00\x02")
             else:
+                print("client send 05 01 00 no auth")
                 # No username/password were entered, therefore we
                 # only support connections with no authentication.
                 writer.write(b"\x05\x01\x00")
@@ -509,11 +523,14 @@ class socksocket(_BaseSocket):
             # We'll receive the server's response to determine which
             # method was selected
             writer.flush()
+            print("client write flush")
+            print("client read 2 bytes")
             chosen_auth = self._readall(reader, 2)
 
             if chosen_auth[0:1] != b"\x05":
                 # Note: string[i:i+1] is used because indexing of a bytestring
                 # via bytestring[i] yields an integer in Python 3
+                print("client raise sent invalid data")
                 raise GeneralProxyError("SOCKS5 proxy server sent invalid data")
 
             # Check the chosen authentication method
@@ -525,6 +542,7 @@ class socksocket(_BaseSocket):
                     # Although we said we don't support authentication, the
                     # server may still request basic username/password
                     # authentication
+                    print("client raise no auth supplied")
                     raise SOCKS5AuthError(
                         "No username/password supplied. "
                         "Server requested username/password"
@@ -542,9 +560,11 @@ class socksocket(_BaseSocket):
                 auth_status = self._readall(reader, 2)
                 if auth_status[0:1] != b"\x01":
                     # Bad response
+                    print("client raise server sent invalid data")
                     raise GeneralProxyError("SOCKS5 proxy server sent invalid data")
                 if auth_status[1:2] != b"\x00":
                     # Authentication failed
+                    print("client raise auth failed")
                     raise SOCKS5AuthError("SOCKS5 authentication failed")
 
                 # Otherwise, authentication succeeded
@@ -553,10 +573,12 @@ class socksocket(_BaseSocket):
             elif chosen_auth[1:2] != b"\x00":
                 # Reaching here is always bad
                 if chosen_auth[1:2] == b"\xFF":
+                    print("client raise rejected auth")
                     raise SOCKS5AuthError(
                         "All offered SOCKS5 authentication methods were" " rejected"
                     )
                 else:
+                    print("client raise server sent invalid data #2")
                     raise GeneralProxyError("SOCKS5 proxy server sent invalid data")
 
             # Now we can request the actual connection
@@ -567,22 +589,28 @@ class socksocket(_BaseSocket):
             # Get the response
             resp = self._readall(reader, 3)
             if resp[0:1] != b"\x05":
+                print("client raise server sent invalid data #3")
                 raise GeneralProxyError("SOCKS5 proxy server sent invalid data")
 
             status = ord(resp[1:2])
             if status != 0x00:
                 # Connection failed: server returned an error
                 error = SOCKS5_ERRORS.get(status, "Unknown error")
+                print("client raise unknown error", status, error)
+                print(SOCKS5Error)
                 raise SOCKS5Error("{:#04x}: {}".format(status, error))
 
             # Get the bound address/port
             bnd = self._read_SOCKS5_address(reader)
 
             super(socksocket, self).settimeout(self._timeout)
+            print("client return", resolved, bnd)
             return (resolved, bnd)
         finally:
+            print("finally, close")
             reader.close()
             writer.close()
+            print("finally, closed")
 
     def _write_SOCKS5_address(self, addr, file):
         """
@@ -859,6 +887,7 @@ class socksocket(_BaseSocket):
             try:
                 # Calls negotiate_{SOCKS4, SOCKS5, HTTP}
                 negotiate = self._proxy_negotiators[proxy_type]
+                print("negotiate!", negotiate)
                 negotiate(self, dest_addr, dest_port)
             except socket.error as error:
                 if not catch_errors:

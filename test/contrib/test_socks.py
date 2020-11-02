@@ -98,13 +98,14 @@ def handle_socks5_negotiation(sock, negotiate, username=None, password=None):
     assert received_version == SOCKS_VERSION_SOCKS5
     nmethods = ord(sock.recv(1))
     methods = _read_exactly(sock, nmethods)
+    print("server read methods", methods)
 
     if negotiate:
         assert SOCKS_NEGOTIATION_PASSWORD in methods
         send_data = SOCKS_VERSION_SOCKS5 + SOCKS_NEGOTIATION_PASSWORD
-        print("send socks5 + pwd nego", send_data)
+        print("server send socks5 + pwd nego", send_data)
         sock.sendall(send_data)
-        print("sent!")
+        print("server sent!")
 
         # This is the password negotiation.
         negotiation_version = sock.recv(1)

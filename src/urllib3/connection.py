@@ -197,6 +197,7 @@ class HTTPConnection(_HTTPConnection, object):
             self.auto_open = 0
 
     def connect(self):
+        print("call new_conn!")
         conn = self._new_conn()
         self._prepare_conn(conn)
 
