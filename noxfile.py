@@ -65,7 +65,9 @@ def tests_impl(session, extras="socks,secure,brotli"):
     session.run("coverage", "xml")
 
 
-@nox.session(python=["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "pypy"])
+@nox.session(
+    python=["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "pypy2", "pypy3"]
+)
 def test(session):
     tests_impl(session)
 

@@ -42,8 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
-        os: [macos-latest, windows-latest]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, pypy2, pypy3]
+        os: [macos-latest, windows-latest, ubuntu-18.04]
         experimental: [false]
         include:
           - python-version: 3.9-dev
@@ -51,7 +51,7 @@ jobs:
             experimental: true
 
     runs-on: ${{ matrix.os }}
-    name: ${{ fromJson('{"macos-latest":"macOS","windows-latest":"Windows"}')[matrix.os] }} (${{ matrix.python-version }})
+    name: ${{ fromJson('{"macos-latest":"macOS","windows-latest":"Windows","ubuntu-18.04":"Ubuntu"}')[matrix.os] }} (${{ matrix.python-version }})
     continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Checkout Repository
