@@ -12,6 +12,7 @@ import pytest
 from dummyserver.server import DEFAULT_CA
 from urllib3._collections import HTTPHeaderDict
 from urllib3.connectionpool import (
+    CertificateError,
     HTTPConnection,
     HTTPConnectionPool,
     HTTPSConnectionPool,
@@ -27,7 +28,6 @@ from urllib3.exceptions import (
     SSLError,
     TimeoutError,
 )
-from urllib3.packages.ssl_match_hostname import CertificateError
 from urllib3.response import HTTPResponse
 from urllib3.util.timeout import Timeout
 

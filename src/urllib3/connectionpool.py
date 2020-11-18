@@ -33,7 +33,15 @@ from .exceptions import (
     TimeoutError,
 )
 from .packages import six
-from .packages.ssl_match_hostname import CertificateError
+
+try:
+    from ssl import CertificateError
+except ImportError:
+
+    class CertificateError(Exception):
+        pass
+
+
 from .request import RequestMethods
 from .response import HTTPResponse
 from .util.connection import is_connection_dropped
