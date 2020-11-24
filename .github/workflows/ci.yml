@@ -42,23 +42,63 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        python-version: [3.9]
+        os: [ubuntu-latest]
         experimental: [false]
         nox-session: ['']
+        i: ['']
         include:
           - python-version: pypy3
             os: ubuntu-latest
             experimental: false
             nox-session: test-pypy
-          - python-version: 3.7
+            i: 1
+          - python-version: pypy3
             os: ubuntu-latest
             experimental: false
-            nox-session: google_brotli
-          - python-version: 2.7
+            nox-session: test-pypy
+            i: 2
+          - python-version: pypy3
             os: ubuntu-latest
             experimental: false
-            nox-session: unsupported_python2
+            nox-session: test-pypy
+            i: 3
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 4
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 5
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 6
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 7
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 8
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 9
+          - python-version: pypy3
+            os: ubuntu-latest
+            experimental: false
+            nox-session: test-pypy
+            i: 10
+
 
     runs-on: ${{ matrix.os }}
     name: ${{ fromJson('{"macos-latest":"macOS","windows-latest":"Windows","ubuntu-latest":"Ubuntu"}')[matrix.os] }} ${{ matrix.python-version }} ${{ matrix.nox-session}}
@@ -86,6 +126,7 @@ jobs:
         env:
           PYTHON_VERSION: ${{ matrix.python-version }}
           NOX_SESSION: ${{ matrix.nox-session }}
+          COVERAGE_DEBUG: sql
 
       - name: Upload Coverage
         run: ./ci/upload_coverage.sh
